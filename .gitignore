@@ -2,3 +2,9 @@
 *.bbl
 *.out
 *.gz
+*.log
+*.blg
+*.toc
+**/.DS_Store
+**/.vscode
+**/__pycache__
