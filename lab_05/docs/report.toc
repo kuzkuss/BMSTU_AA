@@ -1,0 +1,24 @@
+\babel@toc {russian}{}\relax 
+\contentsline {chapter}{Введение}{3}{chapter*.2}%
+\contentsline {chapter}{\numberline {1}Аналитическая часть}{5}{chapter.1}%
+\contentsline {section}{\numberline {1.1}КРМ-схема хранения разреженных матриц}{5}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Последовательный алгоритм}{7}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Алгоритмы, выполняемые на отдельных лентах}{7}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Генерация верхнетреугольной упакованной в КРМ-схему хранения матрицы}{8}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}Удаление из матрицы элементов, меньших либо равных $q$}{8}{subsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.3.3}Вывод матрицы в файл}{9}{subsection.1.3.3}%
+\contentsline {section}{\numberline {1.4}Параллельный алгоритм}{9}{section.1.4}%
+\contentsline {chapter}{\numberline {2}Конструкторская часть}{11}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Разработка алгоритмов}{11}{section.2.1}%
+\contentsline {chapter}{\numberline {3}Технологическая часть}{24}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Средства реализации}{24}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Сведения о модулях программы}{24}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Реализация алгоритмов}{25}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Тестирование}{35}{section.3.4}%
+\contentsline {chapter}{\numberline {4}Исследовательская часть}{37}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Технические характеристики}{37}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Демонстрация работы программы}{38}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Временные характеристики}{38}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Вывод}{39}{section.4.4}%
+\contentsline {chapter}{Заключение}{40}{chapter*.19}%
+\contentsline {chapter}{Список использованных источников}{41}{chapter*.19}%
