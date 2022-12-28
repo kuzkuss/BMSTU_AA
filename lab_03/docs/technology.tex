@@ -1,0 +1,105 @@
+\chapter{Технологическая часть}
+
+В данном разделе приведены средства реализации, сведения о модулях программы, листинги кода, тесты.
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабора-
+торной работы был выбран язык Python \cite{python}. Данный выбор обусловлен наличием массивов и необходимой функциональности для замеров времени.
+
+Замеры времени проводились при помощи функции process\_time\_ns из библиотеки time \cite{python-time}.
+
+\section{Сведения о модулях программы}
+
+Данная программа разбита на следующие модули:
+
+\begin{itemize}
+	\item main.py --- файл, содержащий точку входа в программу, в нем происходит вызов алгоритмов;
+	\item sort.py --- файл, содержащий алгоритмы сортировки;
+	\item array.py --- файл, содержащий функции работы с массивом;
+	\item measurements.py --- файл, содержащий функции замеров времени работы алгоритмов;
+\end{itemize}
+
+\section{Реализация алгоритмов}
+
+В листингах \ref{lst:bead_sort}--\ref{lst:gnome_sort} представлены реализации алгоритмов сортировки: бусинами, подсчетом, гномьей.
+\clearpage
+\begin{center}
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:bead_sort,caption=Алгоритм сортировки бусинами]
+def bead_sort(arr):
+	tmp = [0] * max(arr)
+	
+	for i in range(len(arr)):
+		for j in range(arr[i]):
+			tmp[j] += 1        
+	
+	for i in range(len(arr)):
+		count = 0
+		for j in range(len(tmp)):
+			if tmp[j] > i:
+				count += 1
+		arr[len(arr) - i - 1] = count
+
+\end{lstlisting} 
+\end{center}
+
+\begin{center}
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:counting_sort,caption=Алгоритм сортировки подсчетом]
+def counting_sort(arr):
+	count_arr = [0] * (max(arr) + 1)
+	
+	for i in range(len(arr)):
+		count_arr[arr[i]] += 1
+	
+	idx = 0
+	for i in range(len(count_arr)):
+		for _ in range(count_arr[i]):
+			arr[idx] = i
+			idx += 1
+	    
+\end{lstlisting}
+\end{center}
+\clearpage
+\begin{center}
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:gnome_sort,caption=Алгоритм гномьей сортировки]
+def gnome_sort(arr):
+	i = 1
+	while i < len(arr):
+		if i == 0 or arr[i - 1] <= arr[i]:
+			i += 1
+		else:
+			arr[i - 1], arr[i] = arr[i], arr[i - 1]
+			i -= 1
+
+\end{lstlisting}
+\end{center}
+
+\section{Тестирование}
+
+В таблице \ref{tbl:tests} приведены функциональные тесты для алгоритмов сортировки.
+
+\begin{table}[h]
+	\begin{center}
+		\caption{\label{tbl:tests} Функциональные тесты}
+		\begin{tabular}{|c|c|}
+			\hline
+			Входной массив & Ожидаемый результат \\ 
+			\hline
+			$[]$ & $[]$\\ \hline
+			$[1]$ & $[1]$\\ \hline
+			$[1, 2, 3, 4, 5]$ & $[1, 2, 3, 4, 5]$\\ \hline
+			$[5, 4, 3, 2, 1]$ & $[1, 2, 3, 4, 5]$\\ \hline
+			$[3, 7, 1, 5, 9]$ & $[1, 3, 5, 7, 9]$\\ \hline
+			$[5, 3, 5, 6, 3, 3]$ & $[3, 3, 3, 5, 5, 6]$\\ \hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+При проведении функционального тестирования, полученные результаты работы программы совпали с ожидаемыми. Таким образом, функциональное тестирование пройдено успешно.
+
+\section*{Вывод}
+
+Были реализованы алгоритмы сортировки бусинами, сортировки подсчетом и гномьей сортировки и проведено тестирование их реализаций.

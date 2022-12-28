@@ -1,0 +1,223 @@
+\chapter{Технологическая часть}
+
+В данном разделе приведены средства реализации, сведения о модулях программы, листинги кода, тесты.
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабора-
+торной работы был выбран язык $C++$ \cite{c++}. Данный выбор обусловлен наличием инструментов для реализации принципов многопоточного программирования.
+
+Замеры времени проводились при помощи функции $std::chrono::system\_clock::now(...)$ из библиотеки $chrono$ \cite{time}.
+
+Реализация графического представления замеров времени производилась при помощи языка программирования $Python$ \cite{python}, так как данный язык программирования представляет графическую библиотеку для визуализации данных.
+
+\section{Сведения о модулях программы}
+
+Данная программа разбита на следующие модули:
+
+\begin{itemize}
+	\item main.cpp --- файл, содержащий точку входа в программу, в нем происходит вызов алгоритмов;
+	\item matrix.cpp и matrix.h --- файлы, содержащие алгоритмы работы с матрицами;
+	\item constants.h --- файл, содержащий необходимые константы и объявления;
+	\item measurements.cpp и measurements.h --- файл, содержащий функции замеров времени работы алгоритмов;
+\end{itemize}
+
+\section{Реализация алгоритмов}
+
+В листингах \ref{lst:alg}--\ref{lst:multi} представлены реализации последовательного и параллельного алгоритмов обработки упакованной разреженной матрицы.
+\clearpage
+\begin{center}
+	\captionsetup{justification=raggedright,singlelinecheck=off}
+	\begin{lstlisting}[label=lst:alg,caption=Реализация последовательного алгоритма обработки упакованной разреженной матрицы при фиксированном Q]
+		
+		void delete_elements_from_matrix(matrix_t *matrix, int k) {
+			for (int i = 0; i < matrix->amount;) {
+				if (matrix->AN[i] > k) {
+					for (int j = 0; j < matrix->amount; ++j) {
+						if (matrix->NR[j] == i + 1) {
+							matrix->NR[j] = matrix->NR[i];
+						}
+						if (matrix->NC[j] == i + 1) {
+							matrix->NC[j] = matrix->NC[i];
+						}
+					}
+					for (int m = 0; m < matrix->size; ++m) {
+						if (matrix->JR[m] == i + 1) {
+							if (matrix->NR[i] == i + 1) {
+								matrix->JR[m] = 0;
+							} else {
+								matrix->JR[m] = matrix->NR[i];
+							}
+						}
+						if (matrix->JR[m] > i + 1) {
+							--matrix->JR[m];
+						}
+						if (matrix->JC[m] == i + 1) {
+							if (matrix->NC[i] == i + 1) {
+								matrix->JC[m] = 0;
+							} else {
+								matrix->JC[m] = matrix->NC[i];
+							}
+						}
+						if (matrix->JC[m] > i + 1) {
+							--matrix->JC[m];
+						}
+					}
+					delete_element(matrix->NR, i, matrix->amount);
+					delete_element(matrix->AN, i, matrix->amount);
+					delete_element(matrix->NC, i, matrix->amount);
+					--matrix->amount;
+					for (int j = 0; j < matrix->amount; ++j) {
+						if (matrix->NC[j] > i + 1) {
+							--matrix->NC[j];
+						}
+						if (matrix->NR[j] > i + 1) {
+							--matrix->NR[j];
+						}
+					}
+				} else {
+					++i;
+				}
+			}
+		}
+		
+	\end{lstlisting} 
+\end{center}
+
+
+\begin{center}
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:single,caption=Однопоточная реализация алгоритма обработки упакованной разреженной матрицы]
+
+matrix_t *process (matrix_t matrix, int Q) {
+	cout << "RESULT:" << endl;
+	matrix_t *results = new matrix_t[Q];
+	for (int k = 0; k < Q; ++k) {
+		results[k].amount = matrix.amount;
+		results[k].size = matrix.size;
+		results[k].JR = new int[matrix.size];
+		results[k].JC = new int[matrix.size];
+		results[k].AN = new int[matrix.amount];
+		results[k].NR = new int[matrix.amount];
+		results[k].NC = new int[matrix.amount];
+		
+		memcpy(results[k].JR, matrix.JR, matrix.size * sizeof(int));
+		memcpy(results[k].JC, matrix.JC, matrix.size * sizeof(int));
+		memcpy(results[k].AN, matrix.AN, matrix.amount * sizeof(int));
+		memcpy(results[k].NR, matrix.NR, matrix.amount * sizeof(int));
+		memcpy(results[k].NC, matrix.NC, matrix.amount * sizeof(int));
+		
+		delete_elements_from_matrix(&results[k], k + 1);
+	}
+	return results;
+}
+
+\end{lstlisting} 
+\end{center}
+
+\begin{center}
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:multi,caption=Многопоточная реализация алгоритма обработки упакованной разреженной матрицы]
+
+void parallel_process(matrix_t* matrix, std::vector<matrix_t> results, int count_threads, int thread_index, int Q)
+{
+	cout << endl << "======== THREAD " << thread_index + 1 << " " << "START" << endl;
+	
+	int step = Q / count_threads;
+	int start = thread_index * step;
+	
+	if (thread_index + 1 == count_threads)
+	{
+		step += Q - step * count_threads;
+	}
+	
+	for (int k = start; k < start + step; k++)
+	{
+		results[k].amount = matrix->amount;
+		results[k].size = matrix->size;
+		results[k].JR = new int[matrix->size];
+		results[k].JC = new int[matrix->size];
+		results[k].AN = new int[matrix->amount];
+		results[k].NR = new int[matrix->amount];
+		results[k].NC = new int[matrix->amount];
+		
+		memcpy(results[k].JR, matrix->JR, matrix->size * sizeof(int));
+		memcpy(results[k].JC, matrix->JC, matrix->size * sizeof(int));
+		memcpy(results[k].AN, matrix->AN, matrix->amount * sizeof(int));
+		memcpy(results[k].NR, matrix->NR, matrix->amount * sizeof(int));
+		memcpy(results[k].NC, matrix->NC, matrix->amount * sizeof(int));
+		delete_elements_from_matrix(&results[k], k + 1);
+		cout << "k = " << k + 1 << endl;
+		print_matrix(&results[k]);
+	}
+	
+	cout << endl << "======== THREAD " << thread_index + 1 << " " << "END" << endl;
+}
+
+std::vector<matrix_t> multithreading(int count_threads, matrix_t* matrix, int Q)
+{
+	std::vector<std::thread> threads(count_threads);
+	std::vector<matrix_t> results(Q);
+	
+	for (int i = 0; i < count_threads; i++)
+	{
+		threads[i] = std::thread(parallel_process, std::ref(matrix), std::ref(results), count_threads, i, Q);
+	}
+	
+	for (int i = 0; i < count_threads; i++)
+	{
+		threads[i].join();
+	}
+	
+	return results;
+}
+	    
+\end{lstlisting}
+\end{center}
+
+\section{Тестирование}
+
+В таблице \ref{tbl:tests} приведены функциональные тесты для реализованного алгоритма.
+
+\begin{table}[h]
+	\begin{center}
+		\caption{\label{tbl:tests} Функциональные тесты}
+		\begin{tabular}{|c|c|}
+			\hline
+			Входная матрица и Q & Ожидаемый результат \\ 
+			\hline
+			$[]$ & $[]$\\ 
+			\hline
+			$\begin{array}{cccc}
+				$AN:8, 7, 4, 6, 2, 9$\\
+				$NR:2, 3, 1, 5, 4, 6$\\
+				$NC:1, 4, 5, 2, 6, 3$\\
+				$JR:1, 4, 6$\\
+				$JC:1, 2, 3$\\
+				$Q = 2$
+			\end{array}$
+			 &
+			$\begin{array}{cccc}
+				$k = 1$\\
+				$AN:$\\
+				$NR:$\\
+				$NC:$\\
+				$JR:0, 0, 0$\\
+				$JC:0, 0, 0$\\
+				$k = 2$\\
+				$AN:2$\\
+				$NR:1$\\
+				$NC:1$\\
+				$JR:0, 1, 0$\\
+				$JC:0, 0, 1$
+			\end{array}$
+			\\ \hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+При проведении функционального тестирования, полученные результаты работы программы совпали с ожидаемыми. Таким образом, функциональное тестирование пройдено успешно.
+
+\section*{Вывод}
+
+Были реализованы однопоточная и многопоточная версии заданного алгоритма.
