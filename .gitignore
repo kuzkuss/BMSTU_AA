@@ -1,4 +1,4 @@
-.aux
-.bbl
-.out
-.gz
+*.aux
+*.bbl
+*.out
+*.gz
